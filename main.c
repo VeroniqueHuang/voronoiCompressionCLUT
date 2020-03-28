@@ -94,6 +94,8 @@ void menuFunc(int item) {
   case 1:
   case 2:
   case 3:
+    voronoi();
+    break;
   case 4:
     printf("Tout gris\n");
 	gris_uniforme(image);
