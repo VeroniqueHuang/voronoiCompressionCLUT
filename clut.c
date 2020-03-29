@@ -15,6 +15,7 @@ struct Color {
     GLfloat r;
     GLfloat g;
     GLfloat b;
+    int cub;
 };
 
 typedef struct Point3d Point3d;
@@ -34,13 +35,8 @@ struct site_t {
   int alive;
 };
 static int radius;
+static int cube ;
 
-/*
-typedef struct Clut Clut;
-struct Clut {
-    Color color; //keep the color by the coordinate (r,g,b) of ma_clut
-};
-*/
 static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 
 int rand_a_b (int a, int b){
@@ -69,96 +65,49 @@ int isAllColored(){
 }
 
 int notColored(int x, int y, int z){
-  Color color;
-  color.r = ma_clut[x][y][z].r;
-  color.g = ma_clut[x][y][z].g;
-  color.b = ma_clut[x][y][z].b;
-  if(color.r ==444.0f && color.g==444.0f && color.b==444.0f){
+  printf("-----------------------------------[%d %d %d]%f %f %f\n",x,y,z,ma_clut[x][y][z].r,ma_clut[x][y][z].g,ma_clut[x][y][z].b);
+  if(ma_clut[x][y][z].r ==444.0f && ma_clut[x][y][z].g==444.0f && ma_clut[x][y][z].b==444.0f){
     return 1;
   }
   return 0;
 }
 
 int inScreen(int x, int y, int z){
-  if((x>0 && x<SIZECOLOR) && (y>0 && y<SIZECOLOR) && (z>0 && z<SIZECOLOR))
+  if((x>=0 && x<SIZECOLOR) && (y>=0 && y<SIZECOLOR) && (z>=0 && z<SIZECOLOR))
     return 1;
   return 0;
 }
 
-void setColorPixel(int x, int y, int z, Color color){
-  printf("couleur numero : %f %f %f \n",color.r, color.g, color.b);
-  ma_clut[x][y][z].r = (float)color.r;
-  ma_clut[x][y][z].g = (float)color.g;
-  ma_clut[x][y][z].b = (float)color.b;
+void setColorPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b){
+  ma_clut[x][y][z].r = (GLfloat)r;
+  ma_clut[x][y][z].g = (GLfloat)g;
+  ma_clut[x][y][z].b = (GLfloat)b;
+  ma_clut[x][y][z].cub = radius+1;
 }
 
-int circleNOM(int x0, int y0, int z0, Color colori){
-//  printf("daccord \n");
+int circleNOM(int x0, int y0, int z0, GLfloat r, GLfloat g, GLfloat b){
   int ret=0;
-  int x, y, z, del, incH, incO, t = M_SQRT1_2 * radius + 1; //M_SQRT1_2 = Value of 1/racineCarre(2)
-  //printf("%d ou float %f \n", ret,M_SQRT1_2);
-  del = 3 - (radius << 1);
-  incH = 6;
-  incO = 10 - (radius << 2);
-//printf("%d ooooooooo %d radius: %d\n",x,t,radius);
-    for(x = 0, y = radius, z = radius; x <= t; x++, incH += 4, incO += 4) {
 
+  for(int i=0; i<SIZECOLOR; i++){
+    for(int j=0; j<SIZECOLOR; j++){
+      for(int k=0; k<SIZECOLOR; k++){
+        if(ma_clut[i][j][k].cub == radius ){
+          x0=x0+radius;
+          y0=y0+radius;
+          z0=z0+radius;
 
-    //  printf("okk innnnnnnnnnn %d %d, %d %d, %d %d, %d\n",x0,x ,y0, y,z0, z,radius);
-      printf("comment ???????????? %d %d %d , radius:%d\n",x0+x ,y0+y,z0+ z,radius);
+          printf("%d %d %d aaaaaaaaaaa clut:%d radius:%d \n", i, j ,k, ma_clut[i][j][k].cub, radius );
+          if(inScreen(i+1, j, k)) {if(notColored(i+1, j, k)) {setColorPixel(i+1, j, k, r,g,b); ret=1;}}
+          if(inScreen(i-1, j, k)) {if(notColored(i-1, j, k)) {setColorPixel(i-1, j, k, r,g,b); ret=1;}}
 
-      if(inScreen(x0 + x, y0 + y, z0 + z)){  printf("daccoooord\n");if(notColored(x0 + x, y0 + y, z0 + z)) {setColorPixel(x0 + x, y0 + y, z0 + z, colori); ret=1; } }
-      if(inScreen(x0 + x, y0 + y, z0 - z)) if(notColored(x0 + x, y0 + y, z0 - z)) {setColorPixel(x0 + x, y0 + y, z0 - z, colori); ret=1;  printf("dac\n");}
+          if(inScreen(i, j+1, k)) {if(notColored(i, j+1, k)) {setColorPixel(i, j+1, k, r,g,b); ret=1;}}
+          if(inScreen(i, j-1, k)) {if(notColored(i, j-1, k)) {setColorPixel(i, j-1, k, r,g,b); ret=1;}}
 
-      if(inScreen(x0 + x, y0 - y, z0 + z)) if(notColored(x0 + x, y0 - y, z0 + z)) {setColorPixel(x0 + x, y0 - y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + x, y0 - y, z0 - z)) if(notColored(x0 + x, y0 - y, z0 - z)) {setColorPixel(x0 + x, y0 - y, z0 - z, colori); ret=1;  printf("dac\n");}
+          if(inScreen(i, j, k+1)) {if(notColored(i, j, k+1)) {setColorPixel(i, j, k+1, r,g,b); ret=1;}}
+          if(inScreen(i, j, k-1)) {if(notColored(i, j, k-1)) {setColorPixel(i, j, k-1, r,g,b); ret=1;}}
+        }//end if
 
-      if(inScreen(x0 - x, y0 + y, z0 + z)) if(notColored(x0 - x, y0 + y, z0 + z)) {setColorPixel(x0 - x, y0 + y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - x, y0 + y, z0 - z)) if(notColored(x0 - x, y0 + y, z0 - z)) {setColorPixel(x0 - x, y0 + y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - x, y0 - y, z0 + z)) if(notColored(x0 - x, y0 - y, z0 + z)) {setColorPixel(x0 - x, y0 - y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - x, y0 - y, z0 - z)) if(notColored(x0 - x, y0 - y, z0 - z)) {setColorPixel(x0 - x, y0 - y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 + y, y0 + x, z0 + x)) if(notColored(x0 + y, y0 + x, z0 + x)) {setColorPixel(x0 + y, y0 + x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + y, y0 + x, z0 - x)) if(notColored(x0 + y, y0 + x, z0 - x)) {setColorPixel(x0 + y, y0 + x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 + y, y0 - x, z0 + x)) if(notColored(x0 + y, y0 - x, z0 + x)) {setColorPixel(x0 + y, y0 - x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + y, y0 - x, z0 - x)) if(notColored(x0 + y, y0 - x, z0 - x)) {setColorPixel(x0 + y, y0 - x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - y, y0 + x, z0 + x)) if(notColored(x0 - y, y0 + x, z0 + x)) {setColorPixel(x0 - y, y0 + x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - y, y0 + x, z0 - x)) if(notColored(x0 - y, y0 + x, z0 - x)) {setColorPixel(x0 - y, y0 + x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - y, y0 - x, z0 + x)) if(notColored(x0 - y, y0 - x, z0 + x)) {setColorPixel(x0 - y, y0 - x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - y, y0 - x, z0 - x)) if(notColored(x0 - y, y0 - x, z0 - x)) {setColorPixel(x0 - y, y0 - x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(del < 0) del += incH;
-    else{
-      y--;
-      if(inScreen(x0 + x, y0 + y, z0 + z)) if(notColored(x0 + x, y0 + y, z0 + z)) {setColorPixel(x0 + x, y0 + y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + x, y0 + y, z0 - z)) if(notColored(x0 + x, y0 + y, z0 - z)) {setColorPixel(x0 + x, y0 + y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 + x, y0 - y, z0 + z)) if(notColored(x0 + x, y0 - y, z0 + z)) {setColorPixel(x0 + x, y0 - y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + x, y0 - y, z0 - z)) if(notColored(x0 + x, y0 - y, z0 - z)) {setColorPixel(x0 + x, y0 - y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - x, y0 + y, z0 + z)) if(notColored(x0 - x, y0 + y, z0 + z)) {setColorPixel(x0 - x, y0 + y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - x, y0 + y, z0 - z)) if(notColored(x0 - x, y0 + y, z0 - z)) {setColorPixel(x0 - x, y0 + y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - x, y0 - y, z0 + z)) if(notColored(x0 - x, y0 - y, z0 + z)) {setColorPixel(x0 - x, y0 - y, z0 + z, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - x, y0 - y, z0 - z)) if(notColored(x0 - x, y0 - y, z0 - z)) {setColorPixel(x0 - x, y0 - y, z0 - z, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 + y, y0 + x, z0 + x)) if(notColored(x0 + y, y0 + x, z0 + x)) {setColorPixel(x0 + y, y0 + x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + y, y0 + x, z0 - x)) if(notColored(x0 + y, y0 + x, z0 - x)) {setColorPixel(x0 + y, y0 + x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 + y, y0 - x, z0 + x)) if(notColored(x0 + y, y0 - x, z0 + x)) {setColorPixel(x0 + y, y0 - x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 + y, y0 - x, z0 - x)) if(notColored(x0 + y, y0 - x, z0 - x)) {setColorPixel(x0 + y, y0 - x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - y, y0 + x, z0 + x)) if(notColored(x0 - y, y0 + x, z0 + x)) {setColorPixel(x0 - y, y0 + x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - y, y0 + x, z0 - x)) if(notColored(x0 - y, y0 + x, z0 - x)) {setColorPixel(x0 - y, y0 + x, z0 - x, colori); ret=1;  printf("dac\n");}
-
-      if(inScreen(x0 - y, y0 - x, z0 + x)) if(notColored(x0 - y, y0 - x, z0 + x)) {setColorPixel(x0 - y, y0 - x, z0 + x, colori); ret=1;  printf("dac\n");}
-      if(inScreen(x0 - y, y0 - x, z0 - x)) if(notColored(x0 - y, y0 - x, z0 - x)) {setColorPixel(x0 - y, y0 - x, z0 - x, colori); ret=1;  printf("dac\n");}
-      incO += 4;
-      del += incO;
+      }
     }
   }//end for
   return ret;
@@ -167,22 +116,10 @@ int circleNOM(int x0, int y0, int z0, Color colori){
 
 int diagGrow(){
   int i, fini = 1;
-  Color color;
 
   for(i=0; i<NBCOLOR; i++){
-    //printf("%d iiiii \n",i);
-  //  if(!diag[i].alive) {continue;}
 
-    color.r = diag[i].x/255;
-    color.g = diag[i].y/255;
-    color.b = diag[i].z/255;
-    //diag[i].color.r = color.r;
-    //diag[i].color.g = color.g;
-    //diag[i].color.b = color.b;
-
-
-    if(circleNOM(diag[i].x,diag[i].y,diag[i].z, color.r,color.g,color.b)){
-      //printf("fini = 0 \n");
+    if(circleNOM(diag[i].x,diag[i].y,diag[i].z, diag[i].color.r, diag[i].color.g, diag[i].color.b)){
       fini=0;
     }
     else{
@@ -191,7 +128,7 @@ int diagGrow(){
     }
   }
   radius++;
-  printf("finiii ??? %d\n", !fini);
+  cube++;
   return !fini;
 }
 
@@ -202,6 +139,7 @@ void maclutInit(){
           ma_clut[i][j][k].r=444.0f;
           ma_clut[i][j][k].g=444.0f;
           ma_clut[i][j][k].b=444.0f;
+          ma_clut[i][j][k].cub = -100;
         }
       }
     }
@@ -211,21 +149,26 @@ void diagInit(){
   maclutInit();
   int i, x,y,z;
   radius = 1;
+  cube = 1;
   for(i=0; i<NBCOLOR; i++){ //first : select random coordinate(x,y,z)
 
-    //x = rand_a_b(0,SIZECOLOR);
-    //y = rand_a_b(0,SIZECOLOR);
-    //z = rand_a_b(0,SIZECOLOR);
-    x=1;
-    y=1;
-    z=1;
+    x = rand_a_b(0,SIZECOLOR);
+    y = rand_a_b(0,SIZECOLOR);
+    z = rand_a_b(0,SIZECOLOR);
+
+
+
 
     diag[i].x = x;
     diag[i].y = y;
     diag[i].z = z;
     diag[i].alive = 1;
+    diag[i].color.r = (GLfloat)diag[i].x/5;
+    diag[i].color.g = (GLfloat)diag[i].y/5;
+    diag[i].color.b = (GLfloat)diag[i].z/5;
 
     ma_clut[x][y][z] = getColor(x,y,z); //set the point color to a random position
+    ma_clut[x][y][z].cub = cube;
     //printf(" color %d : (%f,%f,%f) \n", i,ma_clut[x][y][z].r,ma_clut[x][y][z].g,ma_clut[x][y][z].b);
   }
 }
@@ -237,52 +180,41 @@ void affiche(){
       for(int k=0; k<SIZECOLOR; k++){
         printf("%f %f %f \n",ma_clut[i][j][k].r,ma_clut[i][j][k].g,ma_clut[i][j][k].b);
       }
+        printf("\n");
     }
   }
 }
 
-void voronoi(){
-/*  for(int i=0; i<SIZECOLOR; i++){
+
+void afficheCLUT(){
+  printf("-----------------\n\n");
+  for(int i=0; i<SIZECOLOR; i++){
     for(int j=0; j<SIZECOLOR; j++){
-      for(int k=0;k<SIZECOLOR; k++){
+      for(int k=0; k<SIZECOLOR; k++){
+        if(ma_clut[i][j][k].r == 444.0f){
+          printf("0");
+        }
+        else{printf("X");}
       }
+        printf("\n");
     }
-  }*/
-//  diagInit();
-//  diagGrow();
-
-/*
-  diagInit();
-  if(!diagGrow()) {//si cest fini , refaire
-    diagInit();
+    printf("________\n");
   }
-  */
+}
 
-/*
+
+void voronoi(){
+
   diagInit();
-
-
-  do{
-    diagGrow();
-  }
-  while(!isAllColored());
-*/
-
-//------------
-/*  diagInit();
-  while(!isAllColored()){
-    if(!diagGrow()){
-      affiche();
-
+  while( (diagGrow() != 0) ){
+    printf("again \n");
+    if(radius == 4){
+      printf(" radius 3\n");
+      break;
     }
-  }*/
-//-------------
-  diagInit();
-  while(diagGrow() != 0){
-    printf("pas eeeeeeeeeeeeecnooreuuu \n");
   }
 
-  affiche();
+  afficheCLUT();
 
   return;
 }
