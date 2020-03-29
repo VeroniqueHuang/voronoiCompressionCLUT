@@ -95,6 +95,7 @@ void menuFunc(int item) {
   case 2:
   case 3:
     voronoi();
+    //display();
     break;
   case 4:
     printf("Tout gris\n");
