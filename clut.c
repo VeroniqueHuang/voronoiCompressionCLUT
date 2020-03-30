@@ -11,39 +11,6 @@
 #include <time.h>
 #include "clut.h"
 
-typedef struct Color Color;
-struct Color {
-    GLfloat r;
-    GLfloat g;
-    GLfloat b;
-    int cub;
-    int diagnb;
-};
-
-typedef struct Point3d Point3d;
-struct Point3d {
-  int x;
-  int y;
-  int z;
-  int alive;
-  Color color;
-};
-static Point3d diag[NBCOLOR];
-
-typedef struct site_t site_t;
-struct site_t {
-  int x, y;
-  Color color;
-  int alive;
-};
-static int radius;
-static int cube ;
-static Color couleura;
-static Color couleurb;
-
-static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
-static Point3d doublons[NBCOLOR];
-
 int rand_a_b (int a, int b){
   return rand()%(b-a)+a;
 }
@@ -56,18 +23,6 @@ Color getColor(int x, int y, int z){
   return color;
 }
 
-int isAllColored(){
-  for(int i=0; i<SIZECOLOR; i++){
-    for(int j=0; j<SIZECOLOR; j++){
-      for(int k=0; k<SIZECOLOR; k++){
-        if(ma_clut[i][j][k].r==-10.0f && ma_clut[i][j][k].g==-10.0f && ma_clut[i][j][k].b==-10.0f){
-          return 0;
-        }
-      }
-    }
-  }
-  return 1;
-}
 
 int notColored(int x, int y, int z){
   if(ma_clut[x][y][z].r ==-10.0f && ma_clut[x][y][z].g==-10.0f && ma_clut[x][y][z].b==-10.0f){
@@ -92,14 +47,102 @@ void setColorPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b, int nb)
 
 int circleNOM(int x0, int y0, int z0, GLfloat r, GLfloat g, GLfloat b, int nb){
   int ret=0;
+  if(radius==1){
+    if(inScreen(x0, y0, z0)) {if(notColored(x0,y0,z0)) {setColorPixel(x0,y0,z0, r,g,b,nb); ret=1;}}//place un pixel au centre/depart
+  }
+  if(radius==2){
+    printf("innnnnnnnnnnnNNNNNNNNNNNNNNNNNNNNNNNNNN\n");
+    for(int i=((x0-1 <0)? 0 : x0-1);  i<=((x0+1 >SIZECOLOR)? SIZECOLOR : x0+1);  i++){
+      for(int j=((y0-1 <0)? 0 : x0-1);  j<=((y0+1 >SIZECOLOR)? SIZECOLOR : y0+1);  j++){
+        for(int k=((z0-1 <0)? 0 : x0-1);  k<=((z0+1 >SIZECOLOR)? SIZECOLOR : z0+1);  k++){
+          if(inScreen(i, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer un cube de taille 3x3x3
+        }
+      }
+    }
+  }
+  else{//algorithme pour creer une sphere dans tous ces etages
 
-  for(int i=0; i<SIZECOLOR; i++){
-    for(int j=0; j<SIZECOLOR; j++){
-      for(int k=0; k<SIZECOLOR; k++){
+
+    for(int i=((x0-radius-1 <0)? 0 : x0-radius);  i<((x0+radius >=0)? SIZECOLOR : x0+radius);  i++){
+      for(int j=((y0-radius-1 <0)? 0 : y0-radius);  j<((y0+radius >=0)? SIZECOLOR : y0+radius);  j++){
+        for(int k=((z0-radius-1 <0)? 0 : z0-radius);  k<((z0+radius >=0)? SIZECOLOR : z0+radius);  k++){
+          //printf("okk \n");
+            //------------------------------------------------------------------------
+            if((ma_clut[i][j][k].diagnb == nb) && (ma_clut[i][j][k].cub == radius) ||(ma_clut[i][j][k].cub == radius-1)){
+            //  x0=x0+radius;
+            //  y0=y0+radius;
+            //  z0=z0+radius;
+
+              if(inScreen(i+1, j, k)) {if(notColored(i+1, j, k)) {setColorPixel(i+1, j, k, r,g,b,nb); ret=1;printf("yessss\n");}}
+              if(inScreen(i-1, j, k)) {if(notColored(i-1, j, k)) {setColorPixel(i-1, j, k, r,g,b,nb); ret=1;printf("yessss\n");}}
+
+              if(inScreen(i, j+1, k)) {if(notColored(i, j+1, k)) {setColorPixel(i, j+1, k, r,g,b,nb); ret=1;printf("yessss\n");}}
+              if(inScreen(i, j-1, k)) {if(notColored(i, j-1, k)) {setColorPixel(i, j-1, k, r,g,b,nb); ret=1;printf("yessss\n");}}
+
+              if(inScreen(i, j, k+1)) {if(notColored(i, j, k+1)) {setColorPixel(i, j, k+1, r,g,b,nb); ret=1;printf("yessss\n");}}
+              if(inScreen(i, j, k-1)) {if(notColored(i, j, k-1)) {setColorPixel(i, j, k-1, r,g,b,nb); ret=1;printf("yessss\n");}}
+            }//end outer if
+
+          }
+        }
+      }//end for
+
+
+  }
+
+  //-------------------------
+  //int radius2=((radius-2 <0)? 0 : radius-2);
+
+/*  if(inScreen(i+1, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube a partir du centre
+  if(inScreen(i-1, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+
+  if(inScreen(i, j+1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  if(inScreen(i, j-1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+
+  if(inScreen(i, j, k+1)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  if(inScreen(i, j, k-1)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  //horizontale
+  if(inScreen(i+1, j+1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  if(inScreen(i+1, j-1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  if(inScreen(i-1, j+1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+  if(inScreen(i-1, j-1, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+
+
+  if(inScreen(i, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+//------------------ creer le cube avec une boucle
+    for(int i=((x0-radius <0)? 0 : x0-radius);  i<((x0+radius >0)? SIZECOLOR : x0+radius);  i++){
+      for(int j=((y0-radius <0)? 0 : x0-radius);  j<((y0+radius >0)? SIZECOLOR : y0+radius);  j++){
+        for(int k=((z0-radius <0)? 0 : x0-radius);  k<((z0+radius >0)? SIZECOLOR : z0+radius);  k++){
+          if(inScreen(i, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+
+        }
+      }
+    }
+  //-----------------------
+
+  for(int i=x0;  i<((x0-radius >0)? SIZECOLOR : x0+radius);  i++){
+    for(int j=y0;  j<((y0-radius >0)? SIZECOLOR : y0+radius);  j++){
+      for(int k=z0;  k<((z0-radius >0)? SIZECOLOR : z0+radius);  k++){
+          if(inScreen(i, j, k)) {if(notColored(i, j, k)) {setColorPixel(i, j, k, r,g,b,nb); ret=1;}} //creer le cube
+
+
+
+
+
+        }
+      }
+    }
+*/
+/*
+for(int i=((x0-radius <0)? 0 : x0-radius);  i<((x0+radius >0)? SIZECOLOR : x0+radius+1);  i++){
+  for(int j=((y0-radius <0)? 0 : y0-radius);  j<((y0+radius >0)? SIZECOLOR : y0+radius+1);  j++){
+    for(int k=((z0-radius <0)? 0 : z0-radius);  k<((z0+radius >0)? SIZECOLOR : z0+radius+1);  k++){
+      //printf("okk \n");
+        //------------------------------------------------------------------------
         if((ma_clut[i][j][k].diagnb == nb) && (ma_clut[i][j][k].cub == radius)){
-          x0=x0+radius;
-          y0=y0+radius;
-          z0=z0+radius;
+        //  x0=x0+radius;
+        //  y0=y0+radius;
+        //  z0=z0+radius;
 
           if(inScreen(i+1, j, k)) {if(notColored(i+1, j, k)) {setColorPixel(i+1, j, k, r,g,b,nb); ret=1;}}
           if(inScreen(i-1, j, k)) {if(notColored(i-1, j, k)) {setColorPixel(i-1, j, k, r,g,b,nb); ret=1;}}
@@ -109,11 +152,12 @@ int circleNOM(int x0, int y0, int z0, GLfloat r, GLfloat g, GLfloat b, int nb){
 
           if(inScreen(i, j, k+1)) {if(notColored(i, j, k+1)) {setColorPixel(i, j, k+1, r,g,b,nb); ret=1;}}
           if(inScreen(i, j, k-1)) {if(notColored(i, j, k-1)) {setColorPixel(i, j, k-1, r,g,b,nb); ret=1;}}
-        }//end if
+        }//end outer if
 
       }
     }
   }//end for
+  */
   return ret;
 }
 
@@ -131,6 +175,7 @@ int diagGrow(){
       //printf("finish voronoi number%d \n",i);
     }
   }
+  //radius+=2;
   radius++;
   cube++;
   return !fini;
@@ -159,19 +204,22 @@ int doublon(int x, int y, int z){
 
 void diagInit(){
   maclutInit();
-  int i,x,y,z;
+  int i, x,y,z;
   radius = 1;
   cube = 1;
   for(i=0; i<NBCOLOR; i++){ //first : select random coordinate(x,y,z)
 
-    do{
-      x = rand_a_b(0,SIZECOLOR);
-      y = rand_a_b(0,SIZECOLOR);
-      z = rand_a_b(0,SIZECOLOR);
+  /*  do{
+      x = rand_a_b(0,SIZECOLOR-1);
+      y = rand_a_b(0,SIZECOLOR-1);
+      z = rand_a_b(0,SIZECOLOR-1);
 
-    }while(doublon(x,y,z));
+    }while(doublon(x,y,z));*/
+    x =4;
+    y =4;
+    z =4;
 
-    printf("%d %d %d \n", x,y,z);
+    //printf("%d %d %d \n", x,y,z);
     doublons[i].x=x;
     doublons[i].y=y;
     doublons[i].z=z;
@@ -180,14 +228,13 @@ void diagInit(){
     diag[i].y = y;
     diag[i].z = z;
     diag[i].alive = 1;
-    diag[i].color.r = (GLfloat)diag[i].x/SIZECOLOR;
-    diag[i].color.g = (GLfloat)diag[i].y/SIZECOLOR;
-    diag[i].color.b = (GLfloat)diag[i].z/SIZECOLOR;
 
-    //if(i==0){couleura.r = diag[i].color.r; couleura.g = diag[i].color.g; couleura.b = diag[i].color.b;}
-    //if(i==1){couleurb.r = diag[i].color.r; couleurb.g = diag[i].color.g; couleurb.b = diag[i].color.b;}
+    diag[i].color = getColor(x,y,z); //set the point color to a random position
 
-    ma_clut[x][y][z] = getColor(x,y,z); //set the point color to a random position
+    if(i==0){couleura.r = diag[i].color.r; couleura.g = diag[i].color.g; couleura.b = diag[i].color.b;}
+    if(i==1){couleurb.r = diag[i].color.r; couleurb.g = diag[i].color.g; couleurb.b = diag[i].color.b;}
+
+    ma_clut[x][y][z] = diag[i].color;
     ma_clut[x][y][z].cub = cube;
     ma_clut[x][y][z].diagnb = i;
 
@@ -219,10 +266,12 @@ void voronoi(){
 
   diagInit();
   while( diagGrow() != 0 ){
+    //afficheCLUT();
   }
   printf("Clut END\n");
+  afficheCLUT();
 
-  //afficheCLUT();
+
 
   return;
 }
