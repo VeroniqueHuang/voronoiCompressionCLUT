@@ -94,7 +94,8 @@ void menuFunc(int item) {
   case 1:
   case 2:
   case 3:
-    voronoi();
+  voronoi();
+  afficheCLUT();
     //display();
     break;
   case 4:
