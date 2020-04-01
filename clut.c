@@ -140,8 +140,7 @@ void diagInit(){
   //  y =4;
   //  z =4;
 
-  printf("%d %d %d \n", x,y,z);
-    //printf("%d %d %d \n", x,y,z);
+//  printf("%d %d %d \n", x,y,z);
     doublons[i].x=x;
     doublons[i].y=y;
     doublons[i].z=z;
@@ -168,6 +167,9 @@ void afficheCLUT(){
   for(int i=0; i<SIZECOLOR; i++){
     for(int j=0; j<SIZECOLOR; j++){
       for(int k=0; k<SIZECOLOR; k++){
+        printf("-------%f %f %f\n",ma_clut[i][j][k].r,ma_clut[i][j][k].g,ma_clut[i][j][k].b);
+
+      /*
         if(ma_clut[i][j][k].r == couleura.r && ma_clut[i][j][k].g == couleura.g && ma_clut[i][j][k].b == couleura.b){
           printf("0");
         }
@@ -178,8 +180,10 @@ void afficheCLUT(){
       }
         printf("\n");
     }
-    printf("________\n");
-  }
+    printf("________\n");*/
+      }
+    }
+  }//---keep
 }
 
 
@@ -199,4 +203,37 @@ void voronoi(){
 
 
   return;
+}
+
+//---------IMAGE---------------
+
+Color getPixelColor(GLint x, GLint y) {
+    Color color;
+    glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &color);
+    return color;
+}
+
+void compression(char *filename, Image *img){
+   int i, j;
+   int sizex = img->sizeX;
+   int sizey = img->sizeX;
+   Color couleur;
+
+   FILE *fp = fopen(filename, "wb"); /* b - binary mode */
+   (void) fprintf(fp, "P6\n%d %d\n%d\n", sizex, sizey,SIZECOLOR);
+     for (i = 0; i < sizex; ++i){
+       for (j = 0; j < sizey; ++j){
+       couleur = getPixelColor(i,j);
+
+       printf("%f %f %f\n",couleur.r,couleur.g,couleur.b );
+
+       static unsigned char color[3];
+       color[0] = couleur.r*255;  /* red */
+       color[1] = couleur.g*255;  /* green */
+       color[2] = couleur.b*255;  /* blue */
+       (void) fwrite(color, 1, 3, fp);
+     }
+   }
+   (void) fclose(fp);
+   return EXIT_SUCCESS;
 }

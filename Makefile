@@ -27,7 +27,7 @@ LDFLAGS = -lm $(GL_LDFLAGS)
 #definition des fichiers et dossiers
 PROGNAME = palette
 HEADERS = bmp.h clut.h
-SOURCES = main.c ppm.c modif.c clut.c modifClut.c
+SOURCES = main.c ppm.c modif.c clut.c
 #SOURCES = main.c ppm.c modif.c rgb_hls.c
 OBJ = $(SOURCES:.c=.o)
 

@@ -85,6 +85,7 @@ void Reshape(int w, int h) {
 
 void menuFunc(int item) {
   char s[256];
+  char ss[30]="veroniqueGEGE.ppm";
 
   switch(item){
   case 0:
@@ -94,12 +95,15 @@ void menuFunc(int item) {
   case 1:
   case 2:
   case 3:
-  voronoi();
-  afficheCLUT();
+  //voronoi();
+  //afficheCLUT();
+  printf("COMPRESSION DEBUT\n");
+  compression(ss, image);
+  printf("COMPRESSION END\n");
     //display();
     break;
   case 4:
-    printf("Tout gris\n");
+  printf("Tout gris\n");
 	gris_uniforme(image);
 	Display();
     break;
