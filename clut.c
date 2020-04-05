@@ -275,6 +275,13 @@ void compression(char *filename, Image *img){
    static unsigned char color[3];
    //(void) fprintf(fp, "%d %d\n%d\n", sizex, sizey,SIZECOLOR);
    char c[2] ;
+   int nombr[sizex];
+   int num=-10;
+   int stock;
+   int stoc[sizex];
+
+   int n=0;
+   //--------------
      for (i = 0; i < sizex; ++i){
        for (j = 0; j < sizey; ++j){
 
@@ -285,14 +292,44 @@ void compression(char *filename, Image *img){
         color[2] = *(tab + 2)*255;  /* blue */
 
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].diagnb;
+
+        if(num == nombre){
+          hashmap[n].stock=hashmap[n].stock++;
+        }
+
+        else{
+          n++;
+          num = nombre;
+          hashmap[n].nombre = num;
+          hashmap[n].stock = 1;
+        }
+
         //printf("number %d \n",nombre);
-      hexaf(nombre);
-        cc = binaire(nombre);
+        //hexaf(nombre);
+        //cc = binaire(nombre);
 
         //(void) fwrite(cc, 1, 3, fp);
         //Xfprintf(fp, "%d ", nombre);X
      }
+
+  for (int t = 1; t < n+1; ++t){
+
+    if(hashmap[t].stock == 1){
+        fprintf(fp, "%d ",hashmap[t].nombre);
+        printf("%d ",hashmap[t].nombre);
+
+    }
+    else{
+       fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);
+       printf("-%d %d ", hashmap[t].stock, hashmap[t].nombre);
+    }
+     //(void) fwrite(cc, 1, 3, fp)
+     //fprintf(fp, "\n");
    }
+printf("\n");
+n=0;
+num=-10;
+ }//close outer for
    free(tab);
    (void) fclose(fp);
    //return EXIT_SUCCESS;

@@ -9,7 +9,7 @@
 
 
 #define SIZECOLOR 50
-#define NBCOLOR 50 
+#define NBCOLOR 50
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
@@ -38,6 +38,12 @@ struct site_t {
   int alive;
 };
 
+typedef struct hash hash;
+struct hash {
+  int nombre;
+  int stock;
+};
+
 static int radius;
 static int cube ;
 static Color couleura;
@@ -46,6 +52,9 @@ static Color couleurb;
 static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 static Point3d doublons[NBCOLOR];
 static Point3d diag[NBCOLOR];
+
+static hash hashmap[100000];
+
 
 
 //#endif
