@@ -204,7 +204,46 @@ void voronoi(){
 
   return;
 }
+//BINARY
+char * binaire(int nb){
+  int a[300],i,j;
+  for(i=1; nb>0; i++){
+    a[i]=nb%2;
+    nb=nb/2;
+  }
+  char *k = malloc(i*sizeof(char));
 
+  for(i=i-1,j=0;i>=0;i--,j++){
+    printf("%d",a[i]);
+    k[j] =  a[i] + '0';
+  }
+
+return k;
+
+}
+//HEXA
+int hexaf(int decimal){
+long quotient, remainder;
+int i, j = 0;
+char hexadecimal[100];
+
+quotient = decimal;
+
+while (quotient != 0)
+{
+remainder = quotient % 16;          //step 1
+if (remainder < 10)
+hexadecimal[j++] = 48 + remainder;   //step 2
+else
+hexadecimal[j++] = 55 + remainder;   //step 3
+quotient = quotient / 16;            //step 4
+}
+printf("Equivalent hexadecimal value of decimal number %ld:",decimal);
+//step 6
+for (i = j; i >= 0; i--)
+printf("%c \n", hexadecimal[i]);
+return 0;
+}
 //---------IMAGE---------------
 
 Color getPixelColor(GLint x, GLint y) {
@@ -213,27 +252,51 @@ Color getPixelColor(GLint x, GLint y) {
     return color;
 }
 
+float * gg(GLint x, GLint y) {
+  unsigned char pick_col[3];
+  float *f = malloc(3);
+  glReadPixels(x , y , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , pick_col);
+  f[0] = pick_col[0];
+  f[1]= pick_col[1];
+  f[2] = pick_col[2];
+  //printf("%f %f %f dadaaaa\n",f[0],f[1],f[2]);
+  return f;
+}
+
 void compression(char *filename, Image *img){
    int i, j;
    int sizex = img->sizeX;
    int sizey = img->sizeX;
    Color couleur;
-
+   float * tab;
+   int nombre;
+   char *cc = malloc(300*sizeof(char));;
    FILE *fp = fopen(filename, "wb"); /* b - binary mode */
-   (void) fprintf(fp, "P6\n%d %d\n%d\n", sizex, sizey,SIZECOLOR);
+   static unsigned char color[3];
+   //(void) fprintf(fp, "%d %d\n%d\n", sizex, sizey,SIZECOLOR);
+   char c[2] ;
      for (i = 0; i < sizex; ++i){
        for (j = 0; j < sizey; ++j){
-       couleur = getPixelColor(i,j);
 
-       printf("%f %f %f\n",couleur.r,couleur.g,couleur.b );
+        tab=gg(i,j);
 
-       static unsigned char color[3];
-       color[0] = couleur.r*255;  /* red */
-       color[1] = couleur.g*255;  /* green */
-       color[2] = couleur.b*255;  /* blue */
-       (void) fwrite(color, 1, 3, fp);
+        color[0] = *(tab + 0)*255;  /* red */
+        color[1] = *(tab + 1)*255;  /* green */
+        color[2] = *(tab + 2)*255;  /* blue */
+
+        nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].diagnb;
+        //printf("number %d \n",nombre);
+      hexaf(nombre);
+        cc = binaire(nombre);
+
+        //(void) fwrite(cc, 1, 3, fp);
+        //Xfprintf(fp, "%d ", nombre);X
      }
    }
+   free(tab);
    (void) fclose(fp);
-   return EXIT_SUCCESS;
+   //return EXIT_SUCCESS;
 }
+
+//char c = (char)65;
+//char c = Convert.ToChar(65);

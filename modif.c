@@ -4,7 +4,7 @@
 #include <limits.h>
 
 void gris_uniforme(Image * i) {
-  int j, size;
+  int j,ii, size;
   GLubyte * im, val;
   val = 128;
   size = 3 * i->sizeY * i->sizeX;
