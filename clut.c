@@ -265,25 +265,14 @@ float * gg(GLint x, GLint y) {
 
 void compression(char *filename, Image *img){
    int i, j;
-   int sizex = img->sizeX;
-   int sizey = img->sizeX;
-   Color couleur;
    float * tab;
-   int nombre;
-   char *cc = malloc(300*sizeof(char));;
    FILE *fp = fopen(filename, "wb"); /* b - binary mode */
    static unsigned char color[3];
-   //(void) fprintf(fp, "%d %d\n%d\n", sizex, sizey,SIZECOLOR);
-   char c[2] ;
-   int nombr[sizex];
-   int num=-10;
-   int stock;
-   int stoc[sizex];
-
+   int nombre;
+   int num=-1;
    int n=0;
-   //--------------
-     for (i = 0; i < sizex; ++i){
-       for (j = 0; j < sizey; ++j){
+     for (i = 0; i < WIDTH; ++i){//x
+       for (j = 0; j < HEIGHT; ++j){//y
 
         tab=gg(i,j);
 
@@ -292,9 +281,9 @@ void compression(char *filename, Image *img){
         color[2] = *(tab + 2)*255;  /* blue */
 
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].diagnb;
-
+        //printf("%d && %d\n",nombre , num);
         if(num == nombre){
-          hashmap[n].stock=hashmap[n].stock++;
+          hashmap[n].stock=hashmap[n].stock+1;
         }
 
         else{
@@ -303,37 +292,53 @@ void compression(char *filename, Image *img){
           hashmap[n].nombre = num;
           hashmap[n].stock = 1;
         }
-
-        //printf("number %d \n",nombre);
-        //hexaf(nombre);
-        //cc = binaire(nombre);
-
-        //(void) fwrite(cc, 1, 3, fp);
-        //Xfprintf(fp, "%d ", nombre);X
      }
 
   for (int t = 1; t < n+1; ++t){
-
-    if(hashmap[t].stock == 1){
-        fprintf(fp, "%d ",hashmap[t].nombre);
-        printf("%d ",hashmap[t].nombre);
-
-    }
-    else{
-       fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);
-       printf("-%d %d ", hashmap[t].stock, hashmap[t].nombre);
-    }
-     //(void) fwrite(cc, 1, 3, fp)
-     //fprintf(fp, "\n");
-   }
-printf("\n");
-n=0;
-num=-10;
+    if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
+    else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
+  }
+  n=0;
+  num=-1;
  }//close outer for
    free(tab);
    (void) fclose(fp);
-   //return EXIT_SUCCESS;
 }
 
-//char c = (char)65;
-//char c = Convert.ToChar(65);
+void decompression(char *filename){
+
+/*
+   char buff[255];
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff );
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff );
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff );
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff );
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff );
+   fscanf(fp, "%s", buff);
+   printf("1 : %s\n", buff ); */
+   FILE *fp = fopen(filename, "r");
+   char tab[4];
+   char str[] = "";
+
+   char ch;
+   while ((ch = fgetc(fp)) != EOF){
+    if(ch=='*'){
+       //printf("%c", ch);
+       continue;
+     }
+     else if(ch==' '){
+       printf("%s ",str);
+       str[0] = '\0';
+       continue;
+     }
+     else{//if number
+       strncat(str, &ch, 1);
+     }
+  }
+
+}

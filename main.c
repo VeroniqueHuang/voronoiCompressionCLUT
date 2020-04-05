@@ -100,6 +100,10 @@ void menuFunc(int item) {
   printf("COMPRESSION DEBUT\n");
   compression(ss, image);
   printf("COMPRESSION END\n");
+  printf("----DECOMPRESSION DEBUT\n");
+  decompression(ss);
+  printf("----DECOMPRESSION END\n");
+
     //display();
     break;
   case 4:
