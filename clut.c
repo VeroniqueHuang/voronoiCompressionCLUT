@@ -370,7 +370,7 @@ void loadMyImage(char *filename){
   int size;
   FILE *fp;
   fp = fopen(filename, "rb");
-  int stock;
+  GLubyte *stock;
   int nombre;
   int b=0;
   int dat=0;
@@ -379,6 +379,9 @@ void loadMyImage(char *filename){
   char tab[4];
   char str[] = "";
   char ch;
+
+  GLubyte * im;
+  im = img->data;
 
   //read image size information
   int tailleClut;
@@ -406,7 +409,8 @@ void loadMyImage(char *filename){
         printf("nombre %d \n",nombre );
         b=0;
        while(stock>0){
-          img->data[dat] = nombre*255/tailleClut;
+          //img->data[dat] = nombre*255/tailleClut;
+          *im++=(GLubyte)nombre*(GLubyte)255/(GLubyte)tailleClut;
           dat++;
           stock--;
         }
