@@ -59,7 +59,9 @@ int ImageLoad_PPM(char *filename, Image *img)
 	printf("Size image %lu %lu => %d\n", img->sizeX, img->sizeY, size);
 	img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
 	assert(img->data);
-
+  for(int j=0; j<10000; j++){
+    img->data[j]=(GLubyte)0;
+  }
 
     //read pixel data from file
     if (fread(img->data, (size_t) 1, (size_t) size, fp) == 0) {
@@ -68,6 +70,7 @@ int ImageLoad_PPM(char *filename, Image *img)
          exit(1);
 		 */
     }
+    //printf("gegeeeeeeeee %d \n",img->data[1]);
 	/* remettre l image dans le bon sens */
 	//	printf("debut %ld fin %ld\n", (int) img->data, (int) img->data + size);
 	sizex = img->sizeX;

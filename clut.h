@@ -9,7 +9,7 @@
 
 
 #define SIZECOLOR 6
-#define NBCOLOR 50
+#define NBCOLOR 5
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 

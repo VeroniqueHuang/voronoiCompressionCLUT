@@ -104,6 +104,7 @@ void menuFunc(int item) {
   //decompression(ss);
   loadMyImage(ss);
   printf("----DECOMPRESSION END\n");
+  ReInit();
 
     //display();
     break;

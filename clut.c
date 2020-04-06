@@ -358,25 +358,9 @@ void decompression(char *filename){
    printf("1 : %s\n", buff );
    fscanf(fp, "%s", buff);
    printf("1 : %s\n", buff ); */
-   FILE *fp = fopen(filename, "r");
-   char tab[4];
-   char str[] = "";
 
-   char ch;
-   while ((ch = fgetc(fp)) != EOF){
-    if(ch=='*'){
-       printf("%c", ch);
-       continue;
-     }
-     else if(ch==' '){
-       printf("%s ",str);
-       str[0] = '\0';
-       continue;
-     }
-     else{//if number
-       strncat(str, &ch, 1);
-     }
-  }
+
+
 
 }
 
@@ -386,6 +370,15 @@ void loadMyImage(char *filename){
   int size;
   FILE *fp;
   fp = fopen(filename, "rb");
+  int stock;
+  int nombre;
+  int b=0;
+  int dat=0;
+
+
+  char tab[4];
+  char str[] = "";
+  char ch;
 
   //read image size information
   int tailleClut;
@@ -398,5 +391,38 @@ void loadMyImage(char *filename){
   printf("Size image %lu %lu => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
   img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
 
+  while ((ch = fgetc(fp)) != EOF){
+   if(ch=='*'){
+     stock = atoi(str); //convert in integer
+     printf("stock %d ",stock );
+     b=1;
+      //printf("%c", ch);
+      str[0] = '\0';
+      continue;
+    }
+    else if(ch==' '){
+      if(b==1){
+        nombre = atoi(str); //convert number in integer
+        printf("nombre %d \n",nombre );
+        b=0;
+       while(stock>0){
+          img->data[dat] = nombre*255/tailleClut;
+          dat++;
+          stock--;
+        }
+      }
+      //printf("%s ",str);
+      str[0] = '\0';
+      continue;
+    }
+    else{//if number
+      strncat(str, &ch, 1);
+    }
+  }//end while
 
+  if (fread(img->data, (size_t) 1, (size_t) size, fp) == 0) {
+       fprintf(stderr, "Error loading image '%s'\n", filename);
+     }
+
+  fclose(fp);
 }
