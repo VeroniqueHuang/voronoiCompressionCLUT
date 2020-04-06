@@ -8,7 +8,7 @@
 #include <GL/glu.h>
 
 
-#define SIZECOLOR 50
+#define SIZECOLOR 6
 #define NBCOLOR 50
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
@@ -54,6 +54,8 @@ static Point3d doublons[NBCOLOR];
 static Point3d diag[NBCOLOR];
 
 static hash hashmap[100000];
+
+static hash hashmap_clut[SIZECOLOR*SIZECOLOR*SIZECOLOR];
 
 
 

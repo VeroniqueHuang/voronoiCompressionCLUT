@@ -1,4 +1,4 @@
-#include <unistd.h>
+  #include <unistd.h>
 #include <math.h>
 #include "ima.h"
 
@@ -264,13 +264,49 @@ float * gg(GLint x, GLint y) {
 }
 
 void compression(char *filename, Image *img){
-   int i, j;
+   int i, j,l,m,nn;
    float * tab;
    FILE *fp = fopen(filename, "wb"); /* b - binary mode */
+   fprintf(fp, "%lu %lu %lu\n",img->sizeX,img->sizeY,SIZECOLOR);
    static unsigned char color[3];
    int nombre;
    int num=-1;
    int n=0;
+   //CLUT
+    for(l=0; l<SIZECOLOR; l++){
+     for(m=0; m<SIZECOLOR; m++){
+       for(nn=0; nn<SIZECOLOR; nn++){
+         nombre = ma_clut[l][m][nn].diagnb;
+         if(num == nombre){
+           hashmap_clut[n].stock=hashmap_clut[nn].stock+1;
+         }
+
+         else{
+           n++;
+           num = nombre;
+           hashmap_clut[n].nombre = num;
+           hashmap_clut[n].stock = 1;
+         }
+
+       }
+
+       for (int t = 1; t < n+1; ++t){
+         if(hashmap_clut[t].stock == 1){ fprintf(fp, "%d ",hashmap_clut[t].nombre);}
+         else{ fprintf(fp, "%d*%d ", hashmap_clut[t].stock, hashmap_clut[t].nombre);}
+       }
+
+       n=0;
+       num=-1;
+
+     }
+   }//end outer for
+
+
+
+   num=-1;
+   n=0;
+
+   //IMAGE INDEX
      for (i = 0; i < WIDTH; ++i){//x
        for (j = 0; j < HEIGHT; ++j){//y
 
@@ -307,6 +343,7 @@ void compression(char *filename, Image *img){
 
 void decompression(char *filename){
 
+
 /*
    char buff[255];
    fscanf(fp, "%s", buff);
@@ -328,7 +365,7 @@ void decompression(char *filename){
    char ch;
    while ((ch = fgetc(fp)) != EOF){
     if(ch=='*'){
-       //printf("%c", ch);
+       printf("%c", ch);
        continue;
      }
      else if(ch==' '){
@@ -340,5 +377,26 @@ void decompression(char *filename){
        strncat(str, &ch, 1);
      }
   }
+
+}
+
+void loadMyImage(char *filename){
+  Image *img;
+  img = (Image *) malloc(sizeof(Image));
+  int size;
+  FILE *fp;
+  fp = fopen(filename, "rb");
+
+  //read image size information
+  int tailleClut;
+  if (fscanf(fp, "%lu %lu %d", &img->sizeX, &img->sizeY, &tailleClut) != 3) {
+       fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
+       exit(1);
+  }
+
+  size = img->sizeX * img->sizeY * 3;
+  printf("Size image %lu %lu => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
+  img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
+
 
 }

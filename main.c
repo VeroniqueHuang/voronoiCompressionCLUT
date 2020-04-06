@@ -101,7 +101,8 @@ void menuFunc(int item) {
   compression(ss, image);
   printf("COMPRESSION END\n");
   printf("----DECOMPRESSION DEBUT\n");
-  decompression(ss);
+  //decompression(ss);
+  loadMyImage(ss);
   printf("----DECOMPRESSION END\n");
 
     //display();
