@@ -44,6 +44,12 @@ struct hash {
   int stock;
 };
 
+typedef struct glu glu;
+struct glu {
+    GLubyte r,g,b;
+};
+
+
 static int radius;
 static int cube ;
 static Color couleura;
@@ -56,6 +62,8 @@ static Point3d diag[NBCOLOR];
 static hash hashmap[100000];
 
 static hash hashmap_clut[SIZECOLOR*SIZECOLOR*SIZECOLOR];
+static glu color[3];
+
 
 
 

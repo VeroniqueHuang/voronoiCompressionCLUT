@@ -60,7 +60,7 @@ int ImageLoad_PPM(char *filename, Image *img)
 	img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
 	assert(img->data);
   for(int j=0; j<10000; j++){
-    img->data[j]=(GLubyte)0;
+    //img->data[j]=(GLubyte)0;
   }
 
     //read pixel data from file

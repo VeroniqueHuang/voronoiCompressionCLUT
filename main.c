@@ -102,9 +102,11 @@ void menuFunc(int item) {
   printf("COMPRESSION END\n");
   printf("----DECOMPRESSION DEBUT\n");
   //decompression(ss);
-  loadMyImage(ss);
+  loadMyImage(ss,image);
+  //ReInit();
+  Display();
+
   printf("----DECOMPRESSION END\n");
-  ReInit();
 
     //display();
     break;

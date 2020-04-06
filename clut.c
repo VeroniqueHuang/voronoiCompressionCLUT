@@ -273,6 +273,7 @@ void compression(char *filename, Image *img){
    int num=-1;
    int n=0;
    //CLUT
+   fprintf(fp,"[ ");
     for(l=0; l<SIZECOLOR; l++){
      for(m=0; m<SIZECOLOR; m++){
        for(nn=0; nn<SIZECOLOR; nn++){
@@ -301,6 +302,7 @@ void compression(char *filename, Image *img){
      }
    }//end outer for
 
+   fprintf(fp,"] ");
 
 
    num=-1;
@@ -364,9 +366,8 @@ void decompression(char *filename){
 
 }
 
-void loadMyImage(char *filename){
-  Image *img;
-  img = (Image *) malloc(sizeof(Image));
+int loadMyImage(char *filename, Image *img){
+  //img = (Image *) malloc(sizeof(Image));
   int size;
   FILE *fp;
   fp = fopen(filename, "rb");
@@ -380,7 +381,7 @@ void loadMyImage(char *filename){
   char str[] = "";
   char ch;
 
-  GLubyte * im;
+  GLubyte * im, val;
   im = img->data;
 
   //read image size information
@@ -392,8 +393,9 @@ void loadMyImage(char *filename){
 
   size = img->sizeX * img->sizeY * 3;
   printf("Size image %lu %lu => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
-  img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
+  //img->data = (GLubyte *) malloc ((size_t) size * sizeof (GLubyte));
 
+/*
   while ((ch = fgetc(fp)) != EOF){
    if(ch=='*'){
      stock = atoi(str); //convert in integer
@@ -409,11 +411,23 @@ void loadMyImage(char *filename){
         printf("nombre %d \n",nombre );
         b=0;
        while(stock>0){
+         val[0]=0;
+         val[1]=0;
+         val[2]=255;
+         img->data = val;
           //img->data[dat] = nombre*255/tailleClut;
-          *im++=(GLubyte)nombre*(GLubyte)255/(GLubyte)tailleClut;
+          //*im++=(GLubyte)nombre*(GLubyte)255/(GLubyte)tailleClut;
           dat++;
           stock--;
         }
+      }
+      else{
+        val[0]=0;
+        val[1]=0;
+        val[2]=255;
+         img->data = val;
+          //*im++=val;
+
       }
       //printf("%s ",str);
       str[0] = '\0';
@@ -423,10 +437,22 @@ void loadMyImage(char *filename){
       strncat(str, &ch, 1);
     }
   }//end while
+  */
 
-  if (fread(img->data, (size_t) 1, (size_t) size, fp) == 0) {
+  val=200;
+  color->r=255;
+  color->g=0;
+  color->b=255;
+  for (int j = 0; j < size-100; j ++) {
+    im[j*3]=color->r;
+    im[j*3+1]=color->g;
+    im[j*3+2]=color->b;
+  }
+
+/*  if (fread(img->data, (size_t) 1, (size_t) size, fp) == 0) {
        fprintf(stderr, "Error loading image '%s'\n", filename);
-     }
+     }*/
 
   fclose(fp);
+  return 1;
 }

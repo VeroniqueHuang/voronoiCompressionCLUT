@@ -4,6 +4,9 @@
 #include <limits.h>
 
 
+GLubyte rand_a_ (int a, int b){
+  return rand()%(b-a)+a;
+}
 
 void gris_uniforme(Image * i) {
   int j,ii, size;
@@ -12,7 +15,7 @@ void gris_uniforme(Image * i) {
   size = 3 * i->sizeY * i->sizeX;
   im = i->data;
   for (j = 0; j < size; j ++) {
-	*im++ = val;
-  printf("%d %d %d %d\n",im[0],im[1],im[3],im[4]);
+    GLubyte  x = rand_a_b(0,200);
+	  *im++ = x;
   }
 }
