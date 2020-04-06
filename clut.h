@@ -44,8 +44,8 @@ struct hash {
   int stock;
 };
 
-typedef struct glu glu;
-struct glu {
+typedef struct myGlubyte myGlubyte;
+struct myGlubyte {
     GLubyte r,g,b;
 };
 
@@ -60,9 +60,6 @@ static Point3d doublons[NBCOLOR];
 static Point3d diag[NBCOLOR];
 
 static hash hashmap[100000];
-
-static hash hashmap_clut[SIZECOLOR*SIZECOLOR*SIZECOLOR];
-static glu color[3];
 
 
 
