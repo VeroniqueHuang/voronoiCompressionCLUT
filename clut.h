@@ -7,6 +7,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
+//#include <string.h>
+
 
 #define SIZECOLOR 6
 #define NBCOLOR 5

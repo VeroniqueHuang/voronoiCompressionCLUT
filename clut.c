@@ -264,7 +264,7 @@ float * gg(GLint x, GLint y) {
 }
 
 void compression(char *filename, Image *img){
-   int i, j,l,m,nn;
+   int i, j,l;
    float * tab;
    FILE *fp = fopen(filename, "wb"); /* b - binary mode */
    fprintf(fp, "%lu %lu %lu\n",img->sizeX,img->sizeY,SIZECOLOR);
@@ -273,44 +273,12 @@ void compression(char *filename, Image *img){
    int num=-1;
    int n=0;
    //CLUT
-   //fprintf(fp,"[ ");
-  /*  for(l=0; l<SIZECOLOR; l++){
-     for(m=0; m<SIZECOLOR; m++){
-       for(nn=0; nn<SIZECOLOR; nn++){
-         nombre = ma_clut[l][m][nn].diagnb;
-         if(num == nombre){
-           hashmap_clut[n].stock=hashmap_clut[nn].stock+1;
-         }
-
-         else{
-           n++;
-           num = nombre;
-           hashmap_clut[n].nombre = num;
-           hashmap_clut[n].stock = 1;
-         }
-
-       }
-
-       for (int t = 1; t < n+1; ++t){
-         if(hashmap_clut[t].stock == 1){ fprintf(fp, "%d ",hashmap_clut[t].nombre);}
-         else{ fprintf(fp, "%d*%d ", hashmap_clut[t].stock, hashmap_clut[t].nombre);}
-       }
-
-       n=0;
-       num=-1;
-
-     }
-   }//end outer for
-*/
    for(l=0; l<NBCOLOR; l++){
      fprintf(fp, "%d,%f,%f,%f \n",l, diag[l].color.r, diag[l].color.g, diag[l].color.b);
    }
-
    fprintf(fp,"/");
 
-
-   num=-1;
-   n=0;
+   num=-1; n=0;
 
    //IMAGE INDEX
      for (i = 0; i < WIDTH; ++i){//x
@@ -349,7 +317,6 @@ void compression(char *filename, Image *img){
 
 void decompression(char *filename){
 
-
 /*
    char buff[255];
    fscanf(fp, "%s", buff);
@@ -366,8 +333,13 @@ void decompression(char *filename){
    printf("1 : %s\n", buff ); */
 
 
+}
 
-
+char* append(char* s, char c) {
+        int len = strlen(s);
+        s[len] = c;
+        s[len+1] = '\0';
+        return s;
 }
 
 int loadMyImage(char *filename, Image *img){
@@ -375,9 +347,14 @@ int loadMyImage(char *filename, Image *img){
   int size;
   FILE *fp;
   fp = fopen(filename, "rb");
-
-  char str[] = "";
+GLubyte * im;
+im = img->data;
+  //char *str = malloc(10*sizeof(char*));
+char str[100];
+  //str = "";
+   //strcpy(str,"");
   char ch;
+  int index = 0;
 
   //read image size information
   int tailleClut;
@@ -396,19 +373,54 @@ int loadMyImage(char *filename, Image *img){
   int number;
   int nombre,stock;
 
-
-  int s=0;
+  int etoile;
+  int s=size;
   while( (ch = fgetc(fp)) != '/'){
     fscanf(fp, "%d,%f,%f,%f", &number, &couleur.r, &couleur.g, &couleur.b);
     //printf("%d = %f %f %f -%d\n ",number, couleur.r, couleur.g, couleur.b,ff);
     ColorArray[number] = couleur;
   }
 
-    while ((ch = fgetc(fp)) != EOF){
+  while ((ch = fgetc(fp)) != EOF){
+    printf("%d\n",s );
       if(ch == '*'){
+        stock = atoi(str);
+        str[0] = '\0';index = 0;
+        etoile=1;
+      }
+      else if(ch == ' '){
+        if(etoile==1){
+          nombre = atoi(str);
+          while(stock>1){
+            im[s*3]=ColorArray[nombre].r;
+            im[s*3+1]=ColorArray[nombre].g;
+            im[s*3+2]=ColorArray[nombre].b;
+            s--;stock--;
+          }
+          etoile=0;
+         }
+        else{
+          nombre = atoi(str);
+          im[s*3]=ColorArray[nombre].r;
+          im[s*3+1]=ColorArray[nombre].g;
+          im[s*3+2]=ColorArray[nombre].b;
+          s--;
+        }
+          str[0] = '\0';index = 0;
+      }// ' '
+      else{
+        str[index] = ch;index++;
+      }
+  }//end while
+
+/*
+    while ((ch = fgetc(fp)) != EOF){
+      //printf("%d ",ch);
+      if(ch == '*'){
+        //printf("%c",ch);
           stock = atoi(str);
-          str[0] = '\0';
-          while(ch != ' ' ){strcat(str, ch);}
+          str[0] = '\0';index = 0;
+        //  while(ch != ' ' ){str[index] = ch;index++;}
           nombre = atoi(str);
           while(stock>0){
             //im[s*3]=ColorArray[nombre].r;
@@ -416,21 +428,30 @@ int loadMyImage(char *filename, Image *img){
             //im[s*3+2]=ColorArray[nombre].b;
             s++;stock--;
           }
-          str[0] = '\0';
+          //str[0] = '\0';
+            str[0] = '\0';index = 0;
       }
       else if (ch == ' '){
         //im[s*3]=ColorArray[nombre].r;
         //im[s*3+1]=ColorArray[nombre].g;
         //im[s*3+2]=ColorArray[nombre].b;
         s++;
-        str[0] = '\0';
+        str[0] = '\0';index = 0;
       }
       else{//if number
-        strcat(str, ch);
+        str[index] = ch;index++;
       }
     }
-
+*/
     //-------------------------------------
+  /*
+    while ((ch = fgetc(fp)) != EOF){
+
+        printf("%c",ch);
+    }
+  */
+    //-------------------------------------
+
 
 /*
   while ((ch = fgetc(fp)) != EOF){
@@ -489,7 +510,6 @@ int loadMyImage(char *filename, Image *img){
        while(stock>0){
          img->data = val;
           //img->data[dat] = nombre*255/tailleClut;
-          //*im++=(GLubyte)nombre*(GLubyte)255/(GLubyte)tailleClut;
           dat++;
           stock--;
         }
@@ -507,15 +527,16 @@ int loadMyImage(char *filename, Image *img){
     }
   }//end while */
 
-/* OKK good
-  val=200;
-  color->r=255;
-  color->g=0;
-  color->b=255;
-  for (int j = 0; j < size-100; j ++) {
-    im[j*3]=color->r;
-    im[j*3+1]=color->g;
-    im[j*3+2]=color->b;
+/*
+GLubyte  val=200;
+myGlubyte color;
+  color.r=255;
+  color.g=0;
+  color.b=255;
+  for (int j = 0; j < 20000; j ++) {
+    im[j*3]=color.r;
+    im[j*3+1]=color.g;
+    im[j*3+2]=color.b;
   }
 */
 /*  if (fread(img->data, (size_t) 1, (size_t) size, fp) == 0) {
@@ -523,5 +544,5 @@ int loadMyImage(char *filename, Image *img){
      }*/
 
   fclose(fp);
-  return 1;
+  return EXIT_SUCCESS;
 }
