@@ -7,7 +7,6 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-//#include <string.h>
 
 
 #define SIZECOLOR 6
@@ -61,7 +60,7 @@ static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 static Point3d doublons[NBCOLOR];
 static Point3d diag[NBCOLOR];
 
-static hash hashmap[100000];
+static hash hashmap[290];
 
 
 

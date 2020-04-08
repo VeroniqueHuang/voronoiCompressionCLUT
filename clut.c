@@ -2,6 +2,9 @@
 #include <math.h>
 #include "ima.h"
 
+
+#include <string.h>
+
 #include <time.h>
 #include "clut.h"
 
@@ -122,6 +125,11 @@ int doublon(int x, int y, int z){
   }
   return 0;
 }
+
+/*
+int doublon(int x, int y, int z){
+  return 0;
+}*/
 
 void diagInit(){
   maclutInit();
@@ -253,12 +261,13 @@ Color getPixelColor(GLint x, GLint y) {
 }
 
 float * gg(GLint x, GLint y) {
-  unsigned char pick_col[3];
+  GLubyte pick_col[3];
   float *f = malloc(3);
-  glReadPixels(x , y , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , pick_col);
+  glReadPixels(x , y , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
   f[0] = pick_col[0];
   f[1]= pick_col[1];
   f[2] = pick_col[2];
+  //printf("%f %f %f color\n",f[0],f[1],f[2] );
   //printf("%f %f %f dadaaaa\n",f[0],f[1],f[2]);
   return f;
 }
@@ -272,17 +281,20 @@ void compression(char *filename, Image *img){
    int nombre;
    int num=-1;
    int n=0;
+   int keke=0;
    //CLUT
    for(l=0; l<NBCOLOR; l++){
      fprintf(fp, "%d,%f,%f,%f \n",l, diag[l].color.r, diag[l].color.g, diag[l].color.b);
-   }
+  }
    fprintf(fp,"/");
 
    num=-1; n=0;
 
    //IMAGE INDEX
-     for (i = 0; i < WIDTH; ++i){//x
-       for (j = 0; j < HEIGHT; ++j){//y
+     for (i = 0; i <HEIGHT; i++){//x
+       n=0;
+       num=-1;
+       for (j = 0; j<WIDTH; j++){//y
 
         tab=gg(i,j);
 
@@ -291,26 +303,29 @@ void compression(char *filename, Image *img){
         color[2] = *(tab + 2)*255;  /* blue */
 
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].diagnb;
+
         //printf("%d && %d\n",nombre , num);
         if(num == nombre){
           hashmap[n].stock=hashmap[n].stock+1;
+          //printf("%d %d \n",num,nombre);
         }
 
         else{
           n++;
           num = nombre;
+          //printf("%d ",nombre);
           hashmap[n].nombre = num;
           hashmap[n].stock = 1;
         }
      }
 
-  for (int t = 1; t < n+1; ++t){
+  for (int t = 1; t <= n; t++){
     if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
     else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
+    printf(" %d %d, ",hashmap[t].nombre,i);
   }
-  n=0;
-  num=-1;
- }//close outer for
+
+}//close outer for
    free(tab);
    (void) fclose(fp);
 }
@@ -346,11 +361,11 @@ int loadMyImage(char *filename, Image *img){
   //img = (Image *) malloc(sizeof(Image));
   int size;
   FILE *fp;
-  fp = fopen(filename, "rb");
+  fp = fopen(filename, "rw");
 GLubyte * im;
 im = img->data;
   //char *str = malloc(10*sizeof(char*));
-char str[100];
+
   //str = "";
    //strcpy(str,"");
   char ch;
@@ -374,45 +389,62 @@ char str[100];
   int nombre,stock;
 
   int etoile;
-  int s=size;
+  int s=img->sizeX * img->sizeY;
+  //int s=img->sizeX * img->sizeY;
+
   while( (ch = fgetc(fp)) != '/'){
     fscanf(fp, "%d,%f,%f,%f", &number, &couleur.r, &couleur.g, &couleur.b);
     //printf("%d = %f %f %f -%d\n ",number, couleur.r, couleur.g, couleur.b,ff);
     ColorArray[number] = couleur;
   }
-
+char str[3];
+int bb=0;
+str[0] = '\0';
   while ((ch = fgetc(fp)) != EOF){
-    printf("%d\n",s );
-      if(ch == '*'){
-        stock = atoi(str);
-        str[0] = '\0';index = 0;
-        etoile=1;
-      }
-      else if(ch == ' '){
-        if(etoile==1){
-          nombre = atoi(str);
-          while(stock>1){
+  //  printf("%c ",ch);
+      //printf("%d\n",s );
+        if(ch == 42){//star '*'
+          stock = atoi(str);
+          printf("%d* ",stock);
+          bb+=stock;
+          //str[0] = '\0';
+           memset( str, 0, sizeof (str) );
+          index = 0;
+          etoile=1;
+        }
+        else if(ch == 32){//space ' '
+          if(etoile==1){
+            nombre = atoi(str);
+            //printf("%d \n",nombre);
+            while(stock!=1){
+              im[s*3]=ColorArray[nombre].r;
+              im[s*3+1]=ColorArray[nombre].g;
+              im[s*3+2]=ColorArray[nombre].b;
+              s-- ;stock--;
+            }
+            nombre=0;stock=0;
+            etoile=0;
+           }
+          else{
+            bb++;
+            nombre = atoi(str);
+            //printf("-%d \n",nombre);
             im[s*3]=ColorArray[nombre].r;
             im[s*3+1]=ColorArray[nombre].g;
             im[s*3+2]=ColorArray[nombre].b;
-            s--;stock--;
+            s-- ;
           }
-          etoile=0;
-         }
+            //str[0] = '\0';
+            memset( str, 0, sizeof (str) );
+            index = 0;
+        }// ' '
         else{
-          nombre = atoi(str);
-          im[s*3]=ColorArray[nombre].r;
-          im[s*3+1]=ColorArray[nombre].g;
-          im[s*3+2]=ColorArray[nombre].b;
-          s--;
+          str[index]=ch;
+           index++;
         }
-          str[0] = '\0';index = 0;
-      }// ' '
-      else{
-        str[index] = ch;index++;
-      }
   }//end while
-
+printf("%d rbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb\n",bb);
+  str[0] = '\0';//free space
 /*
     while ((ch = fgetc(fp)) != EOF){
       //printf("%d ",ch);
