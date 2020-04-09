@@ -85,7 +85,7 @@ void Reshape(int w, int h) {
 
 void menuFunc(int item) {
   char s[256];
-  char ss[30]="veroniqueimg.txt";
+  char compressImage[30]="CompressionImage.txt";
 
   switch(item){
   case 0:
@@ -96,19 +96,13 @@ void menuFunc(int item) {
   case 2:
   case 3:
   voronoi();
-  //afficheCLUT();
   printf("COMPRESSION DEBUT\n");
-  compression(ss, image);
+  compression(compressImage, image);
   printf("COMPRESSION END\n");
-  printf("----DECOMPRESSION DEBUT\n");
-  //decompression(ss);
-  loadMyImage(ss,image);
-  //ReInit();
+  printf("DECOMPRESSION DEBUT\n");
+  loadMyImage(compressImage,image);
   Display();
-
-  printf("----DECOMPRESSION END\n");
-
-    //display();
+  printf("DECOMPRESSION END\n");
     break;
   case 4:
   printf("Tout gris\n");

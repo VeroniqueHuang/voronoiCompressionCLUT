@@ -248,7 +248,7 @@ str[0] = '\0';
         else if(ch == 32){//if 'ch' is a space ' '
           if(etoile==1){
             nombre = atoi(str);
-            while(stock!=1){
+            while(stock!=0){
               im[s*3]=ColorArray[nombre].r;
               im[s*3+1]=ColorArray[nombre].g;
               im[s*3+2]=ColorArray[nombre].b;
