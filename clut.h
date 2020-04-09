@@ -9,8 +9,8 @@
 
 
 
-#define SIZECOLOR 6
-#define NBCOLOR 5
+#define SIZECOLOR 8
+#define NBCOLOR 200
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
@@ -20,7 +20,7 @@ struct Color {
     GLfloat g;
     GLfloat b;
     int cub;
-    int diagnb;
+    int indexColor;
 };
 
 typedef struct Point3d Point3d;
@@ -58,7 +58,7 @@ static Color couleurb;
 
 static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 static Point3d doublons[NBCOLOR];
-static Point3d diag[NBCOLOR];
+static Point3d ClutIndexColor[NBCOLOR];
 
 static hash hashmap[1024];
 
