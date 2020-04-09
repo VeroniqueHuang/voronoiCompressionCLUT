@@ -60,7 +60,7 @@ static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 static Point3d doublons[NBCOLOR];
 static Point3d diag[NBCOLOR];
 
-static hash hashmap[290];
+static hash hashmap[1024];
 
 
 

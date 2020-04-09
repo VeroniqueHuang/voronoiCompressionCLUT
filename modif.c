@@ -14,7 +14,7 @@ void gris_uniforme(Image * i) {
   val = 128;
   size = 3 * i->sizeY * i->sizeX;
   im = i->data;
-  for (j = 0; j < size-50000; j ++) {
+  for (j = 0; j < size; j ++) {
   //  GLubyte  x = rand_a_b(0,200);
 	  *im++ = val;
   }

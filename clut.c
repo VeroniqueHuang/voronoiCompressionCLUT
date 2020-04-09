@@ -262,8 +262,9 @@ Color getPixelColor(GLint x, GLint y) {
 
 float * gg(GLint x, GLint y) {
   GLubyte pick_col[3];
+  glFlush();
   float *f = malloc(3);
-  glReadPixels(x , y , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
+  glReadPixels(y , x , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
   f[0] = pick_col[0];
   f[1]= pick_col[1];
   f[2] = pick_col[2];
@@ -322,9 +323,9 @@ void compression(char *filename, Image *img){
   for (int t = 1; t <= n; t++){
     if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
     else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
-    printf(" %d %d, ",hashmap[t].nombre,i);
-  }
+  //  printf(" %d %d, ",hashmap[t].nombre,i);
 
+  }
 }//close outer for
    free(tab);
    (void) fclose(fp);
@@ -389,7 +390,7 @@ im = img->data;
   int nombre,stock;
 
   int etoile;
-  int s=img->sizeX * img->sizeY;
+  int s=0;
   //int s=img->sizeX * img->sizeY;
 
   while( (ch = fgetc(fp)) != '/'){
@@ -397,7 +398,7 @@ im = img->data;
     //printf("%d = %f %f %f -%d\n ",number, couleur.r, couleur.g, couleur.b,ff);
     ColorArray[number] = couleur;
   }
-char str[3];
+char str[100000];
 int bb=0;
 str[0] = '\0';
   while ((ch = fgetc(fp)) != EOF){
@@ -405,7 +406,7 @@ str[0] = '\0';
       //printf("%d\n",s );
         if(ch == 42){//star '*'
           stock = atoi(str);
-          printf("%d* ",stock);
+          //printf("%d* ",stock);
           bb+=stock;
           //str[0] = '\0';
            memset( str, 0, sizeof (str) );
@@ -420,7 +421,7 @@ str[0] = '\0';
               im[s*3]=ColorArray[nombre].r;
               im[s*3+1]=ColorArray[nombre].g;
               im[s*3+2]=ColorArray[nombre].b;
-              s-- ;stock--;
+              s++ ;stock--;
             }
             nombre=0;stock=0;
             etoile=0;
@@ -432,7 +433,7 @@ str[0] = '\0';
             im[s*3]=ColorArray[nombre].r;
             im[s*3+1]=ColorArray[nombre].g;
             im[s*3+2]=ColorArray[nombre].b;
-            s-- ;
+            s++ ;
           }
             //str[0] = '\0';
             memset( str, 0, sizeof (str) );
