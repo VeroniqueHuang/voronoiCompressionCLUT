@@ -1,10 +1,7 @@
 #include <unistd.h>
 #include <math.h>
 #include "ima.h"
-
-
 #include <string.h>
-
 #include <time.h>
 #include "clut.h"
 
@@ -59,12 +56,11 @@ int growSphere(int x0, int y0, int z0, GLfloat r, GLfloat g, GLfloat b, int nb){
     }
   }
   else{//create sphere that grow from the origin
-
-
     for(int i=((x0-radius-1 <0)? 0 : x0-radius);  i<((x0+radius >=0)? SIZECOLOR : x0+radius);  i++){
       for(int j=((y0-radius-1 <0)? 0 : y0-radius);  j<((y0+radius >=0)? SIZECOLOR : y0+radius);  j++){
         for(int k=((z0-radius-1 <0)? 0 : z0-radius);  k<((z0+radius >=0)? SIZECOLOR : z0+radius);  k++){
             if((ma_clut[i][j][k].indexColor == nb) && ((ma_clut[i][j][k].cub == radius) ||(ma_clut[i][j][k].cub == radius-1)) ){
+
               if(inScreen(i+1, j, k)) {if(notColored(i+1, j, k)) {setColorPixel(i+1, j, k, r,g,b,nb); ret=1;}}
               if(inScreen(i-1, j, k)) {if(notColored(i-1, j, k)) {setColorPixel(i-1, j, k, r,g,b,nb); ret=1;}}
 
@@ -74,13 +70,13 @@ int growSphere(int x0, int y0, int z0, GLfloat r, GLfloat g, GLfloat b, int nb){
               if(inScreen(i, j, k+1)) {if(notColored(i, j, k+1)) {setColorPixel(i, j, k+1, r,g,b,nb); ret=1;}}
               if(inScreen(i, j, k-1)) {if(notColored(i, j, k-1)) {setColorPixel(i, j, k-1, r,g,b,nb); ret=1;}}
             }
+
           }
         }
       }//end outer for
-  }//end else
+    }//end else
   return ret;
 }
-
 
 int ClutIndexColorGrow(){
   int i, fini = 1;
@@ -92,7 +88,8 @@ int ClutIndexColorGrow(){
       ClutIndexColor[i].alive=0;
     }
   }
-  radius++;cube++;
+  radius++;
+  cube++;
   return !fini;
 }
 
@@ -117,11 +114,6 @@ int doublon(int x, int y, int z){
   return 0;
 }
 
-/*
-int doublon(int x, int y, int z){
-  return 0;
-}*/
-
 void ClutIndexColorInit(){
   maclutInit();
   int i, x,y,z;
@@ -132,7 +124,7 @@ void ClutIndexColorInit(){
       x = rand_a_b(0,SIZECOLOR-1);
       y = rand_a_b(0,SIZECOLOR-1);
       z = rand_a_b(0,SIZECOLOR-1);
-    }while(doublon(x,y,z));//avoid repeating number
+    }while(doublon(x,y,z)); //avoid repeating number
     doublons[i].x=x;
     doublons[i].y=y;
     doublons[i].z=z;
@@ -141,18 +133,16 @@ void ClutIndexColorInit(){
     ClutIndexColor[i].y = y;
     ClutIndexColor[i].z = z;
     ClutIndexColor[i].alive = 1;
-    ClutIndexColor[i].color = getColor(x,y,z); //set the point color to a random position
+    ClutIndexColor[i].color = getColor(x,y,z);//set the point color to a random position
 
     ma_clut[x][y][z] = ClutIndexColor[i].color;
     ma_clut[x][y][z].cub = cube;
     ma_clut[x][y][z].indexColor = i;
-
   }
 }
 
 void voronoi(){
   srand(time(NULL));
-
   ClutIndexColorInit();
   while( ClutIndexColorGrow() != 0 ){
   }
@@ -161,20 +151,19 @@ void voronoi(){
 }
 
 //---------------Compression---------------
-
 float * readPixels(GLint x, GLint y) {//collect the color of pixel(x,y)
   GLubyte pick_col[3];
   glFlush();
-  float *color = malloc(3);
+  float *colorf = malloc(3);
   glReadPixels(y , x , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
-  color[0] = pick_col[0];
-  color[1]= pick_col[1];
-  color[2] = pick_col[2];
-  return color;
+  colorf[0] = pick_col[0];
+  colorf[1]= pick_col[1];
+  colorf[2] = pick_col[2];
+  return colorf;
 }
 
 void compression(char *filename, Image *img){
-   int i, j,l;
+   int i,j,l;
    float * tab;
    FILE *fp = fopen(filename, "wb");
    fprintf(fp, "%lu %lu %lu\n",img->sizeX,img->sizeY,SIZECOLOR);
@@ -182,17 +171,21 @@ void compression(char *filename, Image *img){
    int nombre;
    int num=-1;
    int n=0;
-   //-------Write data of the Clut in file-------
+    //-------Write data of the Clut in file-------
    for(l=0; l<NBCOLOR; l++){
      fprintf(fp, "%d,%f,%f,%f \n",l, ClutIndexColor[l].color.r, ClutIndexColor[l].color.g, ClutIndexColor[l].color.b);
-   }
+  }
    fprintf(fp,"/");
    num=-1; n=0;
 
-   //-------Write data of each pixel (convert in index of color)-------
      for (i = 0; i <HEIGHT; i++){
+       n=0;num=-1;
+      //-------Write data of each pixel (convert in index of color)-------
        for (j = 0; j<WIDTH; j++){
         tab=readPixels(i,j);
+        color[0] = *(tab + 0)*255;  /* red */
+        color[1] = *(tab + 1)*255;  /* green */
+        color[2] = *(tab + 2)*255;  /* blue */
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].indexColor;
         if(num == nombre){
           hashmap[n].stock=hashmap[n].stock+1;
@@ -204,26 +197,27 @@ void compression(char *filename, Image *img){
           hashmap[n].stock = 1;
         }
      }
-    for (int t = 1; t <= n; t++){
-      if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
-      else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
-    }
-  n=0;num=-1;
-}//close outer for
 
+  for (int t = 1; t <= n; t++){
+    if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
+    else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
+  }
+}//close outer for
    free(tab);
    (void) fclose(fp);
 }
 
-//---------------Compression---------------
+//---------------Decompression---------------
 int loadMyImage(char *filename, Image *img){
   int size;
   FILE *fp;
   fp = fopen(filename, "rw");
-GLubyte * im;
-im = img->data;
+  GLubyte * im;
+  im = img->data;
   char ch;
   int index = 0;
+  char str[WIDTH +1];
+  int nbpixel=0;
 
   //read image size information
   int tailleClut;
@@ -234,26 +228,20 @@ im = img->data;
   size = img->sizeX * img->sizeY * 3;
   printf("Size image %lu %lu => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
 
-
   myGlubyte ColorArray[NBCOLOR];
   myGlubyte couleur;
-  int number;
-  int nombre,stock;
-  int etoile;
-  int s=0;
+  int number,nombre, stock, etoile, s=0;
 
   while( (ch = fgetc(fp)) != '/'){
     fscanf(fp, "%d,%f,%f,%f", &number, &couleur.r, &couleur.g, &couleur.b);
     ColorArray[number] = couleur;
   }
-char str[100000];
-int nbpixel=0;
 str[0] = '\0';
   while ((ch = fgetc(fp)) != EOF){
-        if(ch == 42){////if 'ch' is a star '*'
+        if(ch == 42){//if 'ch' is a star '*'
           stock = atoi(str);
           nbpixel+=stock;
-           memset(str, 0, sizeof (str));//empty the string
+           memset( str, 0, sizeof (str) );//empty the string
           index = 0;
           etoile=1;
         }
@@ -277,15 +265,15 @@ str[0] = '\0';
             im[s*3+2]=ColorArray[nombre].b;
             s++ ;
           }
-            memset( str, 0, sizeof (str) );
-            index = 0;
-        }// ' '
+          memset( str, 0, sizeof (str) );
+          index = 0;
+        }
         else{
           str[index]=ch;
-           index++;
+          index++;
         }
   }//end while
-printf("%d pixels affiche\n",nbpixel);
+printf("%d pixels trouve\n",nbpixel);
   str[0] = '\0';//free space
   fclose(fp);
   return EXIT_SUCCESS;
