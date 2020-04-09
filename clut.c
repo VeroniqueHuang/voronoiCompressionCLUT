@@ -5,7 +5,6 @@
 #include <time.h>
 #include "clut.h"
 
-
 //---------------Creating The Color Lookup Table---------------
 int rand_a_b (int a, int b){
   return rand()%(b-a)+a;
@@ -21,9 +20,8 @@ Color getColor(int x, int y, int z){
 
 
 int notColored(int x, int y, int z){//if pixel(x,y,z) is not colored
-  if(ma_clut[x][y][z].r ==-10.0f && ma_clut[x][y][z].g==-10.0f && ma_clut[x][y][z].b==-10.0f){
+  if(ma_clut[x][y][z].r ==-10.0f && ma_clut[x][y][z].g==-10.0f && ma_clut[x][y][z].b==-10.0f)
     return 1;
-  }
   return 0;
 }
 
@@ -106,12 +104,11 @@ void maclutInit(){
     }
   }
 
-int repeatNumber(int x, int y, int z){
-  if(repeat[x][y][z]==1)
+int repeatNumber(int x, int y,int z){
+  if(visited[x][y][z])
     return 1;
   return 0;
 }
-
 void ClutIndexColorInit(){
   maclutInit();
   int i, x,y,z;
@@ -123,7 +120,7 @@ void ClutIndexColorInit(){
       y = rand_a_b(0,SIZECOLOR-1);
       z = rand_a_b(0,SIZECOLOR-1);
     }while(repeatNumber(x,y,z)); //avoid repeating number
-    repeat[x][y][z]=1;
+    visited[x][y][z]=1;
 
     ClutIndexColor[i].x = x;
     ClutIndexColor[i].y = y;
@@ -147,35 +144,35 @@ void voronoi(){
 }
 
 //---------------Compression---------------
-float * readPixels(GLint x, GLint y) {//collect the color of pixel(x,y)
-  GLubyte pick_col[3];
-  glFlush();
-  float *colorf = malloc(3);
-  glReadPixels(y , x , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
-  colorf[0] = pick_col[0];
-  colorf[1]= pick_col[1];
-  colorf[2] = pick_col[2];
-  return colorf;
-}
+  float * readPixels(GLint x, GLint y) {//collect the color of pixel(x,y)
+    GLubyte pick_col[3];
+    glFlush();
+    float *colorf = malloc(3);
+    glReadPixels(y , x , 1 , 1 , GL_RGB , GL_UNSIGNED_BYTE , &pick_col[0]);
+    colorf[0] = pick_col[0];
+    colorf[1]= pick_col[1];
+    colorf[2] = pick_col[2];
+    return colorf;
+  }
 
 void compression(char *filename, Image *img){
-   int i,j,l;
+   int i,j,m;
    float * tab;
    FILE *fp = fopen(filename, "wb");
    fprintf(fp, "%lu %lu %lu\n",img->sizeX,img->sizeY,SIZECOLOR);
    static unsigned char color[3];
    int nombre;
-   int num=-1;
+   int temp=-1;
    int n=0;
     //-------Write data of the Clut in file-------
-   for(l=0; l<NBCOLOR; l++){
-     fprintf(fp, "%d,%f,%f,%f \n",l, ClutIndexColor[l].color.r, ClutIndexColor[l].color.g, ClutIndexColor[l].color.b);
+   for(m=0; m<NBCOLOR; m++){
+     fprintf(fp, "%d,%f,%f,%f \n",m, ClutIndexColor[m].color.r, ClutIndexColor[m].color.g, ClutIndexColor[m].color.b);
   }
    fprintf(fp,"/");
-   num=-1; n=0;
+   temp=-1; n=0;
 
      for (i = 0; i <HEIGHT; i++){
-       n=0;num=-1;
+       n=0;temp=-1;
       //-------Write data of each pixel (convert in index of color)-------
        for (j = 0; j<WIDTH; j++){
         tab=readPixels(i,j);
@@ -183,20 +180,20 @@ void compression(char *filename, Image *img){
         color[1] = *(tab + 1)*255;  /* green */
         color[2] = *(tab + 2)*255;  /* blue */
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].indexColor;
-        if(num == nombre){
-          hashmap[n].stock=hashmap[n].stock+1;
+        if(temp == nombre){
+          recurrence[n].stock=recurrence[n].stock+1;
         }
         else{
           n++;
-          num = nombre;
-          hashmap[n].nombre = num;
-          hashmap[n].stock = 1;
+          temp = nombre;
+          recurrence[n].nombre = temp;
+          recurrence[n].stock = 1;
         }
      }
 
   for (int t = 1; t <= n; t++){
-    if(hashmap[t].stock == 1){ fprintf(fp, "%d ",hashmap[t].nombre);}
-    else{ fprintf(fp, "%d*%d ", hashmap[t].stock, hashmap[t].nombre);}
+    if(recurrence[t].stock == 1){ fprintf(fp, "%d ",recurrence[t].nombre);}
+    else{ fprintf(fp, "%d*%d ", recurrence[t].stock, recurrence[t].nombre);}
   }
 }//close outer for
    free(tab);

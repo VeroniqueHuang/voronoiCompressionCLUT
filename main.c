@@ -95,7 +95,8 @@ void menuFunc(int item) {
   case 1:
   case 2:
   case 3:
-  voronoi();
+  //recurrenceColor(image);
+  voronoi(image);
   printf("COMPRESSION DEBUT\n");
   compression(compressImage, image);
   printf("COMPRESSION END\n");
@@ -139,12 +140,10 @@ int main(int argc, char **argv) {
 
   glutCreateMenu(menuFunc);
   glutAddMenuEntry("Quit", 0);
-  glutAddMenuEntry("gris", 1);
-  glutAddMenuEntry("Gris", 2);
-  glutAddMenuEntry("GRIS", 3);
-  glutAddMenuEntry("grey", 4);
-  glutAddMenuEntry("Sauver", 5);
-  glutAddMenuEntry("Informations", 6);
+  glutAddMenuEntry("Voronoi", 1);
+  glutAddMenuEntry("grey", 2);
+  glutAddMenuEntry("Sauver", 3);
+  glutAddMenuEntry("Informations", 4);
   glutAttachMenu(GLUT_LEFT_BUTTON);
 
   glutDisplayFunc(Display);
