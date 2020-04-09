@@ -93,29 +93,26 @@ void menuFunc(int item) {
     exit(0);
     break;
   case 1:
+    voronoi();
+    printf("COMPRESSION DEBUT\n");
+    compressionImg(compressImage, image);
+    printf("COMPRESSION END\n");
+    printf("DECOMPRESSION DEBUT\n");
+    loadMyImage(compressImage,image);
+    Display();
+    printf("DECOMPRESSION END\n");
+      break;
   case 2:
+    printf("Tout gris\n");
+    gris_uniforme(image);
+    Display();
+      break;
   case 3:
-  //recurrenceColor(image);
-  voronoi(image);
-  printf("COMPRESSION DEBUT\n");
-  compression(compressImage, image);
-  printf("COMPRESSION END\n");
-  printf("DECOMPRESSION DEBUT\n");
-  loadMyImage(compressImage,image);
-  Display();
-  printf("DECOMPRESSION END\n");
-    break;
-  case 4:
-  printf("Tout gris\n");
-	gris_uniforme(image);
-	Display();
-    break;
-  case 5:
     printf("Entrer le nom pour l'image dans cette taille\n");
     scanf("%s", &s[0]);
     imagesave_PPM(s, image);
     break;
-  case 6:
+  case 4:
     printf("Taille de l image : %ld %ld\n", (int) image->sizeX, (int) image->sizeY);
     break;
   default:

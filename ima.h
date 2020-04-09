@@ -23,6 +23,8 @@ void dlr27(Image *), dlr54(Image *), dlr27fs(Image *);
 */
 
 void gris_uniforme (Image *);
+void compressionImg(char *filename, Image *img);
+int loadMyImage(char *filename, Image *img);
 /*void untrait (Image *), untraitOK (Image *);
 void moserr (Image *), mosprox(Image *);
 Image * try2  (Image *);

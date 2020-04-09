@@ -155,12 +155,11 @@ void voronoi(){
     return colorf;
   }
 
-void compression(char *filename, Image *img){
+void compressionImg(char *filename, Image *img){
    int i,j,m;
    float * tab;
    FILE *fp = fopen(filename, "wb");
    fprintf(fp, "%lu %lu %lu\n",img->sizeX,img->sizeY,SIZECOLOR);
-   static unsigned char color[3];
    int nombre;
    int temp=-1;
    int n=0;
@@ -176,9 +175,6 @@ void compression(char *filename, Image *img){
       //-------Write data of each pixel (convert in index of color)-------
        for (j = 0; j<WIDTH; j++){
         tab=readPixels(i,j);
-        color[0] = *(tab + 0)*255;  /* red */
-        color[1] = *(tab + 1)*255;  /* green */
-        color[2] = *(tab + 2)*255;  /* blue */
         nombre = ma_clut[(int)(*(tab + 0)*SIZECOLOR/255)][(int)(*(tab + 1)*SIZECOLOR/255)][(int)(*(tab + 2)*SIZECOLOR/255)].indexColor;
         if(temp == nombre){
           recurrence[n].stock=recurrence[n].stock+1;

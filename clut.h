@@ -51,13 +51,10 @@ struct myGlubyte {
 
 static int radius;
 static int cube ;
-static Color couleura;
-static Color couleurb;
-
 static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
 static Point3d ClutIndexColor[NBCOLOR];
 
 static recurr recurrence[1024];
-static visited[NBCOLOR][NBCOLOR][NBCOLOR];
+static int visited[NBCOLOR][NBCOLOR][NBCOLOR];
 
 //#endif
