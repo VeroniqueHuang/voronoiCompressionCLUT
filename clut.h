@@ -7,8 +7,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-#define SIZECOLOR 6
-#define NBCOLOR 200
+#define SIZECOLOR 8
+#define NBCOLOR 210
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
@@ -21,8 +21,8 @@ struct Color {
     int indexColor;
 };
 
-typedef struct Point3d Point3d;
-struct Point3d {
+typedef struct index3d index3d;
+struct index3d {
   int x;
   int y;
   int z;
@@ -55,10 +55,11 @@ static Color couleura;
 static Color couleurb;
 
 static Color ma_clut[SIZECOLOR][SIZECOLOR][SIZECOLOR];
-static Point3d doublons[NBCOLOR];
-static Point3d ClutIndexColor[NBCOLOR];
+static index3d doublons[NBCOLOR];
+static index3d ClutIndexColor[NBCOLOR];
 
 static hash hashmap[1024];
+static int repeat[NBCOLOR][NBCOLOR][NBCOLOR]
 
 
 

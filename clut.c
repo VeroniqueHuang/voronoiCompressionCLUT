@@ -106,11 +106,9 @@ void maclutInit(){
     }
   }
 
-int doublon(int x, int y, int z){
-  for(int i=0; i<NBCOLOR; i++){
-    if(doublons[i].x==x && doublons[i].y==y && doublons[i].z==z)
-      return 1;
-  }
+int repeatNumber(int x, int y, int z){
+  if(repeat[x][y][z]==1)
+    return 1;
   return 0;
 }
 
@@ -124,10 +122,8 @@ void ClutIndexColorInit(){
       x = rand_a_b(0,SIZECOLOR-1);
       y = rand_a_b(0,SIZECOLOR-1);
       z = rand_a_b(0,SIZECOLOR-1);
-    }while(doublon(x,y,z)); //avoid repeating number
-    doublons[i].x=x;
-    doublons[i].y=y;
-    doublons[i].z=z;
+    }while(repeatNumber(x,y,z)); //avoid repeating number
+    repeat[x][y][z]=1;
 
     ClutIndexColor[i].x = x;
     ClutIndexColor[i].y = y;
