@@ -168,7 +168,6 @@ void compressionImg(char *filename, Image *img){
      fprintf(fp, "%d,%f,%f,%f \n",m, ClutIndexColor[m].color.r, ClutIndexColor[m].color.g, ClutIndexColor[m].color.b);
   }
    fprintf(fp,"/");
-   temp=-1; n=0;
 
      for (i = 0; i <HEIGHT; i++){
        n=0;temp=-1;
@@ -206,7 +205,6 @@ int loadMyImage(char *filename, Image *img){
   char ch;
   int index = 0;
   char str[WIDTH +1];
-  int nbpixel=0;
 
   //read image size information
   int tailleClut;
@@ -215,7 +213,7 @@ int loadMyImage(char *filename, Image *img){
        exit(1);
   }
   size = img->sizeX * img->sizeY * 3;
-  printf("Size image %lu %lu => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
+  printf("Size image %d %d => %d %d\n", img->sizeX, img->sizeY, size, tailleClut);
 
   myGlubyte ColorArray[NBCOLOR];
   myGlubyte couleur;
@@ -225,12 +223,11 @@ int loadMyImage(char *filename, Image *img){
     fscanf(fp, "%d,%f,%f,%f", &number, &couleur.r, &couleur.g, &couleur.b);
     ColorArray[number] = couleur;
   }
-str[0] = '\0';
+  memset( str, 0, sizeof (str) );
   while ((ch = fgetc(fp)) != EOF){
         if(ch == 42){//if 'ch' is a star '*'
           stock = atoi(str);
-          nbpixel+=stock;
-           memset( str, 0, sizeof (str) );//empty the string
+          memset( str, 0, sizeof (str) );//empty the string
           index = 0;
           etoile=1;
         }
@@ -247,7 +244,6 @@ str[0] = '\0';
             etoile=0;
            }
           else{
-            nbpixel++;
             nombre = atoi(str);
             im[s*3]=ColorArray[nombre].r;
             im[s*3+1]=ColorArray[nombre].g;
@@ -262,7 +258,6 @@ str[0] = '\0';
           index++;
         }
   }//end while
-printf("%d pixels trouve\n",nbpixel);
   str[0] = '\0';//free space
   fclose(fp);
   return EXIT_SUCCESS;

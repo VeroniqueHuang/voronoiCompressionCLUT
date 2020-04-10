@@ -7,8 +7,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-#define SIZECOLOR 10
-#define NBCOLOR 600
+#define SIZECOLOR 7
+#define NBCOLOR 200
 #define WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
